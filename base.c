@@ -21,6 +21,7 @@
     ========================================================================
 */
 #include <stdio.h>
+#include <string.h> // for strcpy
 #define STACK_SIZE 50 // 최대 스택 크기
 
 int     call_stack[STACK_SIZE];         // Call Stack을 저장하는 배열
@@ -72,16 +73,42 @@ void print_stack()
     printf("================================\n\n");
 }
 
-
 //func 내부는 자유롭게 추가해도 괜찮으나, 아래의 구조를 바꾸지는 마세요
 void func1(int arg1, int arg2, int arg3)
 {
     int var_1 = 100;
 
     // func1의 스택 프레임 형성 (함수 프롤로그 + push)
+    SP++;
+    strcpy(stack_info[SP],"func1 SFP");
+    call_stack[SP] = FP;
+    FP = SP;
+
+    SP++;
+    strcpy(stack_info[SP],"var_1");
+    call_stack[SP] = 100;
+
     print_stack();
+
+    //func1 arg & ret addr push
+    SP++;
+    strcpy(stack_info[SP],"arg2");
+    call_stack[SP] = 13;
+
+    SP++;
+    strcpy(stack_info[SP],"arg1");
+    call_stack[SP] = 11;
+
+    SP++;
+    strcpy(stack_info[SP],"Return Address");
+    call_stack[SP] = -1;
+
     func2(11, 13);
     // func2의 스택 프레임 제거 (함수 에필로그 + pop)
+    SP = FP;
+    FP = call_stack[SP];
+    SP -= 4;
+
     print_stack();
 }
 
@@ -91,9 +118,32 @@ void func2(int arg1, int arg2)
     int var_2 = 200;
 
     // func2의 스택 프레임 형성 (함수 프롤로그 + push)
+    SP++;
+    strcpy(stack_info[SP],"func2 SFP");
+    call_stack[SP] = FP;
+    FP = SP;
+
+    SP++;
+    strcpy(stack_info[SP],"var_2");
+    call_stack[SP] = 200;
+
     print_stack();
+
+    //func1 arg & ret addr push
+    SP++;
+    strcpy(stack_info[SP],"arg1");
+    call_stack[SP] = 77;
+
+    SP++;
+    strcpy(stack_info[SP],"Return Address");
+    call_stack[SP] = -1;
+
     func3(77);
     // func3의 스택 프레임 제거 (함수 에필로그 + pop)
+    SP = FP;
+    FP = call_stack[SP];
+    SP -= 3;
+
     print_stack();
 }
 
@@ -104,6 +154,19 @@ void func3(int arg1)
     int var_4 = 400;
 
     // func3의 스택 프레임 형성 (함수 프롤로그 + push)
+    SP++;
+    strcpy(stack_info[SP],"func3 SFP");
+    call_stack[SP] = FP;
+    FP = SP;
+
+    SP++;
+    strcpy(stack_info[SP],"var_3");
+    call_stack[SP] = 300;
+
+    SP++;
+    strcpy(stack_info[SP],"var_4");
+    call_stack[SP] = 400;
+
     print_stack();
 }
 
@@ -111,8 +174,29 @@ void func3(int arg1)
 //main 함수에 관련된 stack frame은 구현하지 않아도 됩니다.
 int main()
 {
+    //func1 arg & ret addr push
+    SP++;
+    strcpy(stack_info[SP],"arg3");
+    call_stack[SP] = 3;
+
+    SP++;
+    strcpy(stack_info[SP],"arg2");
+    call_stack[SP] = 2;
+
+    SP++;
+    strcpy(stack_info[SP],"arg1");
+    call_stack[SP] = 1;
+
+    SP++;
+    strcpy(stack_info[SP],"Return Address");
+    call_stack[SP] = -1;
+
     func1(1, 2, 3);
     // func1의 스택 프레임 제거 (함수 에필로그 + pop)
+    SP = FP;
+    FP = call_stack[SP];
+    SP -= 5;
+
     print_stack();
     return 0;
 }
