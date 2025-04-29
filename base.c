@@ -35,7 +35,7 @@ char    stack_info[STACK_SIZE][20];     // Call Stack 요소에 대한 설명을
     FP는 현재 함수의 스택 프레임 포인터입니다.
     실행 중인 함수 스택 프레임의 sfp를 가리킵니다.
 */
-int SP = -1; 
+int SP = -1;
 int FP = -1;
 
 void func1(int arg1, int arg2, int arg3);
@@ -79,15 +79,26 @@ void push(char* info, int value)
     strcpy(stack_info[SP], info);
     call_stack[SP] = value;
 }
+
+int num_pop;
+void pop()
+{
+    SP--;
+}
+
+void eplilog(){
+    SP = FP;
+    FP = call_stack[SP];
+}
 //func 내부는 자유롭게 추가해도 괜찮으나, 아래의 구조를 바꾸지는 마세요
 void func1(int arg1, int arg2, int arg3)
 {
     int var_1 = 100;
 
     // func1의 스택 프레임 형성 (함수 프롤로그 + push)
-    push("main SFP", FP);
+    push("func1 SFP", FP);
     FP = SP;
-    push("var_1", 100);
+    push("var_1", var_1);
 
     print_stack();
 
@@ -98,9 +109,8 @@ void func1(int arg1, int arg2, int arg3)
     func2(11, 13);
 
     // func2의 스택 프레임 제거 (함수 에필로그 + pop)
-    SP = FP;
-    FP = call_stack[SP];
-    SP -= 4;
+    eplilog();
+    for (num_pop = 0; num_pop < 4; num_pop++){pop();}
 
     print_stack();
 }
@@ -111,9 +121,10 @@ void func2(int arg1, int arg2)
     int var_2 = 200;
 
     // func2의 스택 프레임 형성 (함수 프롤로그 + push)
-    push("func1 SFP", FP);
+    push("func2 SFP", FP);
     FP = SP;
-    push("var_2", 200);
+    push("var_2", var_2);
+
     print_stack();
     
     //func3 arg & ret addr push
@@ -122,9 +133,8 @@ void func2(int arg1, int arg2)
     func3(77);
     
     // func3의 스택 프레임 제거 (함수 에필로그 + pop)
-    SP = FP;
-    FP = call_stack[SP];
-    SP -= 3;
+    eplilog();
+    for (num_pop = 0; num_pop < 3; num_pop++){pop();}
 
     print_stack();
 }
@@ -136,10 +146,10 @@ void func3(int arg1)
     int var_4 = 400;
 
     // func3의 스택 프레임 형성 (함수 프롤로그 + push)
-    push("func2 SFP", FP);
+    push("func3 SFP", FP);
     FP = SP;
-    push("var_3", 300);
-    push("var_4", 400);
+    push("var_3", var_3);
+    push("var_4", var_4);
 
     print_stack();
 }
@@ -156,9 +166,8 @@ int main()
     func1(1, 2, 3);
 
     // func1의 스택 프레임 제거 (함수 에필로그 + pop)
-    SP = FP;
-    FP = call_stack[SP];
-    SP -= 5;
+    eplilog();
+    for (num_pop = 0; num_pop < 5; num_pop++){pop();}
 
     print_stack();
     return 0;
